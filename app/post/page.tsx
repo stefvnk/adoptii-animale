@@ -2,51 +2,43 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { UploadIcon, UserIcon, PhoneIcon, MailIcon, CheckIcon, PawIcon } from "@/components/Icons";
+
+type FormState = {
+  name: string; species: string; breed: string; age: string; gender: string;
+  location: string; description: string; vaccinated: boolean; sterilized: boolean;
+  contactName: string; contactPhone: string; contactEmail: string;
+};
+
+const empty: FormState = {
+  name: "", species: "", breed: "", age: "", gender: "", location: "",
+  description: "", vaccinated: false, sterilized: false,
+  contactName: "", contactPhone: "", contactEmail: "",
+};
 
 export default function PostPage() {
+  const [form, setForm] = useState<FormState>(empty);
   const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({
-    name: "",
-    species: "",
-    breed: "",
-    age: "",
-    gender: "",
-    location: "",
-    description: "",
-    vaccinated: false,
-    sterilized: false,
-    contactName: "",
-    contactPhone: "",
-    contactEmail: "",
-  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const target = e.target as HTMLInputElement;
-    setForm((prev) => ({
-      ...prev,
-      [target.name]: target.type === "checkbox" ? target.checked : target.value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
+  const set = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const t = e.target as HTMLInputElement;
+    setForm((p) => ({ ...p, [t.name]: t.type === "checkbox" ? t.checked : t.value }));
   };
 
   if (submitted) {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="text-8xl mb-6">🎉</div>
-          <h2 className="text-3xl font-extrabold text-gray-900 mb-4">Anunțul a fost postat!</h2>
-          <p className="text-gray-500 mb-8">
-            Mulțumim că ajuți! Anunțul tău pentru <strong>{form.name}</strong> va fi vizibil în câteva minute după verificare.
+        <div className="max-w-sm w-full text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
+            <CheckIcon size={28} className="text-success" />
+          </div>
+          <h2 className="text-2xl font-bold text-ink-900 mb-2">Anunț publicat!</h2>
+          <p className="text-ink-500 text-sm mb-6">
+            Mulțumim că ajuți! <strong>{form.name}</strong> va apărea pe platformă după o scurtă verificare.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/animals" className="btn-primary">
-              Vezi toate anunțurile
-            </Link>
-            <button onClick={() => { setSubmitted(false); setForm({ name: "", species: "", breed: "", age: "", gender: "", location: "", description: "", vaccinated: false, sterilized: false, contactName: "", contactPhone: "", contactEmail: "" }); }} className="btn-outline">
+          <div className="flex flex-col gap-3">
+            <Link href="/animals" className="btn-primary w-full">Înapoi la animale</Link>
+            <button onClick={() => { setSubmitted(false); setForm(empty); }} className="btn-outline w-full">
               Postează alt anunț
             </button>
           </div>
@@ -56,38 +48,42 @@ export default function PostPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Postează un anunț</h1>
-        <p className="text-gray-500">Ajută un animal să găsească o familie. Anunțul e gratuit și durează 2 minute.</p>
+        <h1 className="text-3xl font-extrabold text-ink-900 mb-1">Postează un anunț</h1>
+        <p className="text-ink-500 text-sm">Gratuit · Verificat în 24h · Vizibil în toată România</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Animal info */}
-        <div className="bg-white rounded-2xl shadow-md p-6 space-y-5">
-          <h2 className="text-xl font-bold text-gray-900 border-b pb-3">🐾 Detalii animal</h2>
+      <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-5">
+
+        {/* Animal */}
+        <div className="bg-white border border-ink-100 rounded-2xl shadow-card p-6 space-y-5">
+          <h2 className="font-bold text-ink-900 text-base flex items-center gap-2">
+            <PawIcon size={16} className="text-brand-500" />
+            Detalii animal
+          </h2>
 
           <div>
             <label className="label">Numele animalului *</label>
-            <input type="text" name="name" value={form.name} onChange={handleChange} required placeholder="ex: Max, Luna..." className="input" />
+            <input name="name" value={form.name} onChange={set} required placeholder="ex: Max, Luna..." className="input" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Specie *</label>
-              <select name="species" value={form.species} onChange={handleChange} required className="input">
+              <select name="species" value={form.species} onChange={set} required className="input">
                 <option value="">Selectează...</option>
-                <option value="dog">🐶 Câine</option>
-                <option value="cat">🐱 Pisică</option>
-                <option value="other">🐰 Alt animal</option>
+                <option value="dog">Câine</option>
+                <option value="cat">Pisică</option>
+                <option value="other">Alt animal</option>
               </select>
             </div>
             <div>
               <label className="label">Gen *</label>
-              <select name="gender" value={form.gender} onChange={handleChange} required className="input">
+              <select name="gender" value={form.gender} onChange={set} required className="input">
                 <option value="">Selectează...</option>
-                <option value="M">♂ Mascul</option>
-                <option value="F">♀ Femelă</option>
+                <option value="M">Mascul</option>
+                <option value="F">Femelă</option>
               </select>
             </div>
           </div>
@@ -95,78 +91,106 @@ export default function PostPage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="label">Rasă</label>
-              <input type="text" name="breed" value={form.breed} onChange={handleChange} placeholder="ex: Labrador mix" className="input" />
+              <input name="breed" value={form.breed} onChange={set} placeholder="ex: Labrador mix" className="input" />
             </div>
             <div>
               <label className="label">Vârstă estimată</label>
-              <input type="text" name="age" value={form.age} onChange={handleChange} placeholder="ex: 2 ani, 6 luni" className="input" />
+              <input name="age" value={form.age} onChange={set} placeholder="ex: 2 ani, 6 luni" className="input" />
             </div>
           </div>
 
           <div>
-            <label className="label">Locație (oraș / județ) *</label>
-            <input type="text" name="location" value={form.location} onChange={handleChange} required placeholder="ex: București, Sector 2" className="input" />
+            <label className="label">Localitate / Județ *</label>
+            <input name="location" value={form.location} onChange={set} required placeholder="ex: Cluj-Napoca" className="input" />
           </div>
 
           <div>
             <label className="label">Descriere</label>
             <textarea
-              name="description"
-              value={form.description}
-              onChange={handleChange}
-              rows={4}
-              placeholder="Povestește puțin despre animal — temperament, cum a fost găsit, cu ce se înțelege..."
-              className="input resize-none"
+              name="description" value={form.description} onChange={set} rows={4}
+              placeholder="Temperament, cum a fost găsit, cu cine se înțelege..."
+              className="input resize-none leading-relaxed"
             />
           </div>
 
-          <div className="space-y-3">
+          <div>
             <label className="label">Stare medicală</label>
-            <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-200 hover:border-purple-300 transition">
-              <input type="checkbox" name="vaccinated" checked={form.vaccinated} onChange={handleChange} className="accent-purple-600 w-5 h-5" />
-              <span className="text-gray-700 font-medium">Vaccinat ✓</span>
-            </label>
-            <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl border border-gray-200 hover:border-purple-300 transition">
-              <input type="checkbox" name="sterilized" checked={form.sterilized} onChange={handleChange} className="accent-purple-600 w-5 h-5" />
-              <span className="text-gray-700 font-medium">Sterilizat ✓</span>
-            </label>
+            <div className="grid grid-cols-2 gap-3 mt-1">
+              {[
+                { name: "vaccinated", label: "Vaccinat", checked: form.vaccinated },
+                { name: "sterilized", label: "Sterilizat", checked: form.sterilized },
+              ].map((cb) => (
+                <label key={cb.name} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                  cb.checked ? "border-brand-300 bg-brand-50" : "border-ink-200 hover:border-ink-300"
+                }`}>
+                  <input type="checkbox" name={cb.name} checked={cb.checked} onChange={set} className="sr-only" />
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                    cb.checked ? "bg-brand-500 border-brand-500" : "border-ink-300"
+                  }`}>
+                    {cb.checked && <CheckIcon size={11} className="text-white" />}
+                  </div>
+                  <span className="text-sm font-medium text-ink-700">{cb.label}</span>
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Photo upload */}
-        <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
-          <h2 className="text-xl font-bold text-gray-900 border-b pb-3">📷 Fotografii</h2>
-          <div className="border-2 border-dashed border-purple-300 rounded-xl p-8 text-center hover:border-purple-500 transition cursor-pointer bg-purple-50/50">
-            <div className="text-5xl mb-3">📸</div>
-            <p className="font-semibold text-gray-700">Apasă pentru a adăuga poze</p>
-            <p className="text-sm text-gray-400 mt-1">PNG, JPG, WEBP — max 5 poze, 10MB fiecare</p>
-            <input type="file" accept="image/*" multiple className="hidden" />
-          </div>
+        {/* Photos */}
+        <div className="bg-white border border-ink-100 rounded-2xl shadow-card p-6">
+          <h2 className="font-bold text-ink-900 text-base mb-4 flex items-center gap-2">
+            <UploadIcon size={16} className="text-brand-500" />
+            Fotografii
+          </h2>
+          <label className="block border-2 border-dashed border-ink-200 rounded-xl p-8 text-center hover:border-brand-400 hover:bg-brand-50/30 transition-colors cursor-pointer">
+            <div className="w-10 h-10 bg-ink-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <UploadIcon size={18} className="text-ink-400" />
+            </div>
+            <p className="text-sm font-semibold text-ink-700">Adaugă fotografii</p>
+            <p className="text-xs text-ink-400 mt-1">PNG, JPG, WEBP — max 5 poze, 10 MB fiecare</p>
+            <input type="file" accept="image/*" multiple className="sr-only" />
+          </label>
         </div>
 
-        {/* Contact info */}
-        <div className="bg-white rounded-2xl shadow-md p-6 space-y-5">
-          <h2 className="text-xl font-bold text-gray-900 border-b pb-3">📞 Date de contact</h2>
-          <p className="text-sm text-gray-400">Datele tale nu vor fi afișate public. Cei interesați te vor contacta prin platformă.</p>
+        {/* Contact */}
+        <div className="bg-white border border-ink-100 rounded-2xl shadow-card p-6 space-y-5">
+          <div>
+            <h2 className="font-bold text-ink-900 text-base flex items-center gap-2">
+              <UserIcon size={16} className="text-brand-500" />
+              Date de contact
+            </h2>
+            <p className="text-xs text-ink-400 mt-1">Nu vor fi afișate public. Adoptorii te contactează prin platformă.</p>
+          </div>
+
           <div>
             <label className="label">Numele tău *</label>
-            <input type="text" name="contactName" value={form.contactName} onChange={handleChange} required placeholder="Prenume și nume" className="input" />
+            <input name="contactName" value={form.contactName} onChange={set} required placeholder="Prenume Nume" className="input" />
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="label">Telefon *</label>
-              <input type="tel" name="contactPhone" value={form.contactPhone} onChange={handleChange} required placeholder="07xx xxx xxx" className="input" />
+              <label className="label flex items-center gap-1.5">
+                <PhoneIcon size={13} className="text-ink-400" /> Telefon *
+              </label>
+              <input type="tel" name="contactPhone" value={form.contactPhone} onChange={set} required placeholder="07xx xxx xxx" className="input" />
             </div>
             <div>
-              <label className="label">Email *</label>
-              <input type="email" name="contactEmail" value={form.contactEmail} onChange={handleChange} required placeholder="email@exemplu.ro" className="input" />
+              <label className="label flex items-center gap-1.5">
+                <MailIcon size={13} className="text-ink-400" /> Email *
+              </label>
+              <input type="email" name="contactEmail" value={form.contactEmail} onChange={set} required placeholder="email@exemplu.ro" className="input" />
             </div>
           </div>
         </div>
 
-        <button type="submit" className="btn-primary w-full text-base py-4">
-          🐾 Publică anunțul gratuit
+        <button type="submit" className="btn-primary-lg w-full">
+          Publică anunțul gratuit
         </button>
+
+        <p className="text-center text-xs text-ink-400">
+          Prin publicare ești de acord cu{" "}
+          <span className="text-brand-500 underline cursor-pointer">Termenii și Condițiile</span>
+        </p>
       </form>
     </div>
   );
